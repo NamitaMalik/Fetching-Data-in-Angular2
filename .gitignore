@@ -1,0 +1,21 @@
+###########################
+#WebStorm Files
+###########################
+.idea/
+*ipr
+*.iml
+
+###########################
+#NPM Files
+###########################
+node_modules/
+npm-debug.log
+
+###########################
+#Angular2 Files
+###########################
+typings/
+app/*.js
+app/**.js
+app/*.js.map
+app/**.js.map
