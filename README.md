@@ -299,5 +299,75 @@ export class PostsListsComponent {
 
 We have completed all the pending stuff and now we should be able to see list of posts.
 
+But before we end this post, let's have a look at one for operator i.e. **toPromise**. This **operator** converts an **Observable** sequence to a **promise**. So if we use promises, then our `posts-data.service.ts` would look like:
+
+```
+import {Injectable} from "@angular/core";
+import {PostsData} from './posts-data';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+
+@Injectable()
+export class PostsDataService {
+    constructor (private http: Http) {}
+    getData (): Promise<PostsData[]> {
+        return this.http.get('http://jsonplaceholder.typicode.com/posts/')
+            .toPromise()
+            .then(this.extractData)
+            .catch(this.handleError);
+    }
+    private extractData(res: Response) {
+        let body = res.json();
+        return body || [];
+    }
+    private handleError (error: any) {
+        // In a real world app, we might use a remote logging infrastructure
+        // We'd also dig deeper into the error to get a better message
+        let errMsg = (error.message) ? error.message :
+            error.status ? `${error.status} - ${error.statusText}` : 'Server error';
+        console.error(errMsg); // log to console instead
+        return Observable.throw(errMsg);
+    }
+}
+```
+
+If you could notice the difference, we have moved `this.extractData` which is the **success callback** as the first parameter whereas `this.errorHandler` is the second parameter.
+
+Since we are now using **promises** we will also have to make tweaks in `posts-lists.component.ts`. We will have to call `then` on the  returned promise instead of `subscribe`.
+
+```
+import {Component} from '@angular/core';
+import {PostsDataService} from './posts-data.service';
+import {PostsData} from './posts-data';
+
+@Component({
+    selector:'posts-list',
+    template: `
+    <div>
+        <ul class="items">
+        <li *ngFor="let postData of postsData">
+        <span>{{postData.title}}</span></li>
+        </ul>
+    </div>
+    `
+})
+
+export class PostsListsComponent {
+    constructor(private _postsDataService: PostsDataService) {
+        this.getPosts();
+    }
+
+    private postsData:PostsData[]=[];
+    private errorMessage:any='';
+
+    getPosts() {
+        this._postsDataService.getData()
+            .then(
+                posts => this.postsData=posts,
+                error =>  this.errorMessage = <any>error);
+    }
+}
+```
+
 As promised this blog educated us on fetching data in **Angular2** We are yet to see how to post data to a server in **Angular2** so stay tuned! till then Happy Learning!
 
