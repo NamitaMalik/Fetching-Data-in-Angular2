@@ -15,19 +15,18 @@ import {PostsData} from './posts-data';
         <span>{{postData.title}}</span></li>
         </ul>
     </div>
-    `,
-    providers: [PostsDataService]
+    `
 })
 
 export class PostsListsComponent {
     constructor(private _postsDataService: PostsDataService) {
-        this.log();
+        this.getPosts();
     }
 
     private postsData:PostsData[]=[];
     private errorMessage:any='';
 
-    log() {
+    getPosts() {
         this._postsDataService.getData()
             .subscribe(
                 posts => this.postsData=posts,

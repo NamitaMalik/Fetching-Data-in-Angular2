@@ -4,6 +4,7 @@
 
 import {Component}  from '@angular/core';
 import {PostsListsComponent} from './posts-lists.component';
+import {PostsDataService} from './posts-data.service';
 
 @Component({
     selector:'posts-parent',
@@ -11,6 +12,7 @@ import {PostsListsComponent} from './posts-lists.component';
     <h2>View Posts</h2>
     <posts-list></posts-list>
   `,
-    directives:[PostsListsComponent]
+    directives:[PostsListsComponent],
+    providers: [PostsDataService]
 })
 export class PostsComponent { }
