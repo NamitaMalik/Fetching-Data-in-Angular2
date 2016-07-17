@@ -1,4 +1,4 @@
-# Fetching-Data-in-Angular2
+# Fetching Data in Angular2
 
 One of the most common scenario in any application is **client** interacting with the **server**. **HTTP** is the widely used protocol for this interaction. One can fetch data from the server, update data, create data and delete it using **HTTP** protocol.
 
@@ -6,7 +6,7 @@ The focus of this blog is to discuss the **GET** method of **HTTP** protocol.
 
 In **Angular1.x**, we used **$http** service which provided us a **get()** method to fetch data from server. A simple **GET** request in **Angular1.x** was something like:
 
-```
+```JavaScript
 $http({method: 'GET', url: '/someUrl'})
     .then(function successCallback(response) {}, 
         function errorCallback(response) {}); 
@@ -52,7 +52,7 @@ To achieve the above scenario let's break this small app into parts:
 
 Here is our `app.component.ts`:
 
-```
+```TypeScript
 import {Component} from '@angular/core';
 import {PostsComponent} from './posts/post.component'
 
@@ -71,7 +71,7 @@ export class AppComponent {
    
 and here is the `posts.component.ts`:
    
-```
+```TypeScript
 import {Component}  from '@angular/core';
 import {PostsListsComponent} from './posts-lists.component';
 import {PostsDataService} from './posts-data.service';
@@ -94,7 +94,7 @@ In case you are not aware about the **Angular2** services, you can have a quick 
 
 Let's see the `posts-data.ts`, where we define the `PostsData`:
 
-```
+```TypeScript
 export interface PostsData {
     userId:number;
     id:number;
@@ -105,7 +105,7 @@ export interface PostsData {
 
 Now, let's have a look at our `posts-lists.component.ts` which exports the `PostsListsComponent`:
 
-```
+```TypeScript
 import {Component} from '@angular/core';
 import {PostsDataService} from './posts-data.service';
 import {PostsData} from './posts-data';
@@ -139,7 +139,7 @@ Couple of most important tasks are still pending in the above component:
 
 So, let's move to the `posts-data.service.ts` where a lot of action will actually take place:
 
-```
+```TypeScript
 import {Injectable} from "@angular/core";
 import {PostsData} from './posts-data';
 
@@ -154,7 +154,7 @@ Now, let's start one by one:
 2. We need to use a few operators in our `getData()` function so we need to import them. Instead of importing all the operators let's import the required ones
  in `rxjs-operators.ts` and then import this into our `app.component.ts`. So our `app.component.ts` would now be:
  
-```
+```TypeScript
 import {Component} from '@angular/core';
 import {PostsComponent} from './posts/post.component'
 import './rxjs-operators';
@@ -174,38 +174,38 @@ export class AppComponent {
  
 3. Now, we need to have a `getData()` function which will get posts from the api. So here is what our `getData()` function should be like:
 
-```
+```TypeScript
 getData (): Observable<PostsData[]> {
-           return this.http.get('http://jsonplaceholder.typicode.com/posts/')
-               .map(this.extractData)
-               .catch(this.handleError);
-       }
+   return this.http.get('http://jsonplaceholder.typicode.com/posts/')
+       .map(this.extractData)
+       .catch(this.handleError);
+}
 ```
 
 The api 'http://jsonplaceholder.typicode.com/posts/' returns us an array of posts data whereas our `http.get` would return us an **Observable**.
 We then use the **map** operator which transforms the response emitted by Observable by applying a function to it. So in case of success, our flow would now move to `extractData()` function, which is:
 
-```
+```TypeScript
 private extractData(res: Response) {
-        let body = res.json();
-        return body || [];
-    }
+    let body = res.json();
+    return body || [];
+}
 ```
 
 In the above snippet we are transforming are response to the **json** format by doing `res.json()`.
 
 But in case, we had encountered error, our flow would have moved to `catch` operator. The **catch** operator intercepts an **onError** notification from **Observable** and continues the sequence without error. `handleError()` function would have come into play in that case:
 
-```
+```TypeScript
 private handleError (error: any) {
-        let errMsg = (error.message) ? error.message : error.status ? `${error.status} - ${error.statusText}` : 'Server error';
-        return Observable.throw(errMsg);
-    }
+    let errMsg = (error.message) ? error.message : error.status ? `${error.status} - ${error.statusText}` : 'Server error';
+    return Observable.throw(errMsg);
+}
 ```
 
 After joining all the parts, our `posts-data.services.ts` would look like:
 
-```
+```TypeScript
 import {Injectable} from "@angular/core";
 import {PostsData} from './posts-data';
 import { Http, Response } from '@angular/http';
@@ -236,26 +236,26 @@ Now, let's move back to the `PostsListsComponent` and complete our pending stuff
 
 1. We will first add definition part to our `getPosts()` function:
 
-```
+```TypeScript
 getPosts() {
-        this._postsDataService.getData()
-            .subscribe(
-                posts => this.postsData=posts,
-                error =>  this.errorMessage = <any>error);
-    }
+    this._postsDataService.getData()
+        .subscribe(
+            posts => this.postsData=posts,
+            error =>  this.errorMessage = <any>error);
+}
 ```    
 
 We can see the **subscribe** operator in the above snippet. In **Rxjs** one can **subscribe** to an **Observable** by passing 0 to 3 individual functions `onNext`, `onError` and `onCompleted`.
 
 2. Now, we need to display the fetched `posts` in this `PostsListsComponent`. So our template would like:
 
-```
-   <div>
-        <ul class="items">
-        <li *ngFor="let postData of postsData">
-        <span>{{postData.title}}</span></li>
-        </ul>
-    </div>
+```HTML
+<div>
+    <ul class="items">
+    <li *ngFor="let postData of postsData">
+    <span>{{postData.title}}</span></li>
+    </ul>
+</div>
 ```    
 
 In case you are not aware about how to iterate over **Arrays**, **Map**, **Set** you can have a quick read [here](http://namitamalik.github.io/NgRepeat-vs-ngFor/).
@@ -263,7 +263,7 @@ In case you are not aware about how to iterate over **Arrays**, **Map**, **Set**
 
 So now our complete `PostsListsComponent` would look like:
 
-```
+```TypeScript
 import {Component} from '@angular/core';
 import {PostsDataService} from './posts-data.service';
 import {PostsData} from './posts-data';
@@ -301,7 +301,7 @@ We have completed all the pending stuff and now we should be able to see list of
 
 But before we end this post, let's have a look at one for operator i.e. **toPromise**. This **operator** converts an **Observable** sequence to a **promise**. So if we use promises, then our `posts-data.service.ts` would look like:
 
-```
+```TypeScript
 import {Injectable} from "@angular/core";
 import {PostsData} from './posts-data';
 import { Http, Response } from '@angular/http';
@@ -335,7 +335,7 @@ If you could notice the difference, we have moved `this.extractData` which is th
 
 Since we are now using **promises** we will also have to make tweaks in `posts-lists.component.ts`. We will have to call `then` on the  returned promise instead of `subscribe`.
 
-```
+```TypeScript
 import {Component} from '@angular/core';
 import {PostsDataService} from './posts-data.service';
 import {PostsData} from './posts-data';
