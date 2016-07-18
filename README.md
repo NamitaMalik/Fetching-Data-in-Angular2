@@ -22,6 +22,7 @@ To start off with, Observables are nothing but a stream of data.These data strea
 even stream of events. One react to the stream by listening to it. Observables are basically based on **Observer Design Pattern**. In **Observer Design Pattern** one-to-many dependency is maintained between the objects, when one object changes its state all other objects/dependents are notified. These dependents are known as **Observers**.
 
 A stream can emit 3 different things:
+
 1. Value
 2. Error
 3. Completed signal
@@ -33,6 +34,7 @@ One can capture these events by using these functions. These functions are known
 
 **1.Hot** - **Hot observables** are those which produce values even before their subscription gets activated. One can consider **Hot Observables** as live performances. The **hot observable** sequence is shared among each **subscriber**, also each **subscriber** gets the next value 
  in the sequence.
+
 **2.Cold** - **Cold observables** behave like standard **iterators**. They push values only when we subscribes to them and they reset when we subscribe again. One can consider **Cold Observables** as a movie.
 
 **Angular2** has chosen **Rxjs** as its core async pattern. **Rxjs** provides a number of operators attached to a stream such as **map**, **filter**, **scan**, **flatMap**, **toPromise**, **catch**.
@@ -41,14 +43,14 @@ Well, the above discussion is not even a tip of the iceberg on a subject such as
 
 Let's now move back the original agenda of this blog i.e. fetching data using **Http** service. Here is a sample use case:
 
--> We need to display a list of posts. The list of posts can be fetched through this API - 'http://jsonplaceholder.typicode.com/posts/'.
+> We need to display a list of posts. The list of posts can be fetched through this API - http://jsonplaceholder.typicode.com/posts/.
 
 To achieve the above scenario let's break this small app into parts:
 
 1. `AppComponent` - This the parent component for our application.
 2. `PostsComponent` - This the child component inside our `AppComponent`. It will currently have `PostsListsComponent` as its child component. Tomorrow, if we plan to display the detail of a post, we may add **PostsDetailComponent** to display the details.
-3. `PostsData` - We make `PostsData` **interface** to define the type of that we will receive from the **get** api.
-4. `PostsDataService` - This service will actually fetch the data from the **get** api for us.
+3. `PostsData` - We make `PostsData` **interface** to define the type of that we will receive from the **GET** api.
+4. `PostsDataService` - This service will actually fetch the data from the **GET** api for us.
 
 Here is our `app.component.ts`:
 
@@ -70,7 +72,7 @@ export class AppComponent {
 ```
    
 and here is the `posts.component.ts`:
-   
+
 ```TypeScript
 import {Component}  from '@angular/core';
 import {PostsListsComponent} from './posts-lists.component';
@@ -90,7 +92,7 @@ export class PostsComponent {
 ```
 
 We have injected `PostsDataService`. We register it as a provider by doing `providers:[PostsDataService]` so that its instance is available to all the child components of `PostsComponent`.
-In case you are not aware about the **Angular2** services, you can have a quick read [here](http://namitamalik.github.io/Services-in-Angular2/)
+In case you are not aware about the **Angular2** Services, you can have a quick read [Services in Angular2](http://namitamalik.github.io/Services-in-Angular2/)
 
 Let's see the `posts-data.ts`, where we define the `PostsData`:
 
@@ -151,8 +153,21 @@ export class PostsDataService {
 Now, let's start one by one:
 
 1. First, we need to import **Http** and **Response** from `@angular/http` and also need to import **Observable** from `rxjs/Observable`.
-2. We need to use a few operators in our `getData()` function so we need to import them. Instead of importing all the operators let's import the required ones
- in `rxjs-operators.ts` and then import this into our `app.component.ts`. So our `app.component.ts` would now be:
+So our `posts-data.service.ts` would now be:
+
+```TypeScript
+import {Injectable} from "@angular/core";
+import {PostsData} from './posts-data';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+
+@Injectable()
+export class PostsDataService {
+}
+```
+
+2. We need to use a few operators in our `getData()` function so we need to import them. Instead of importing all the operators let's import the required ones 
+in `rxjs-operators.ts` and then import this into our `app.component.ts`. So our `app.component.ts` would now be:
  
 ```TypeScript
 import {Component} from '@angular/core';
@@ -182,8 +197,9 @@ getData (): Observable<PostsData[]> {
 }
 ```
 
-The api 'http://jsonplaceholder.typicode.com/posts/' returns us an array of posts data whereas our `http.get` would return us an **Observable**.
-We then use the **map** operator which transforms the response emitted by Observable by applying a function to it. So in case of success, our flow would now move to `extractData()` function, which is:
+The api http://jsonplaceholder.typicode.com/posts/ returns us an array of posts data whereas our `http.get` would return us an **Observable**.
+We then use the **map** operator which transforms the response emitted by Observable by applying a function to it. So in case of success, our flow 
+would now move to `extractData()` function, which is:
 
 ```TypeScript
 private extractData(res: Response) {
@@ -194,7 +210,8 @@ private extractData(res: Response) {
 
 In the above snippet we are transforming are response to the **json** format by doing `res.json()`.
 
-But in case, we had encountered error, our flow would have moved to `catch` operator. The **catch** operator intercepts an **onError** notification from **Observable** and continues the sequence without error. `handleError()` function would have come into play in that case:
+But in case, we had encountered error, our flow would have moved to `catch` operator. The **catch** operator intercepts an **onError** notification 
+from **Observable** and continues the sequence without error. `handleError()` function would have come into play in that case:
 
 ```TypeScript
 private handleError (error: any) {
@@ -235,7 +252,6 @@ We should note that the above **Observable** is a **cold observable**. So one ha
 Now, let's move back to the `PostsListsComponent` and complete our pending stuff:
 
 1. We will first add definition part to our `getPosts()` function:
-
 ```TypeScript
 getPosts() {
     this._postsDataService.getData()
@@ -245,10 +261,10 @@ getPosts() {
 }
 ```    
 
-We can see the **subscribe** operator in the above snippet. In **Rxjs** one can **subscribe** to an **Observable** by passing 0 to 3 individual functions `onNext`, `onError` and `onCompleted`.
+We can see the **subscribe** operator in the above snippet. In **Rxjs** one can **subscribe** to an **Observable** by passing 0 to 3 individual 
+functions `onNext`, `onError` and `onCompleted`.
 
 2. Now, we need to display the fetched `posts` in this `PostsListsComponent`. So our template would like:
-
 ```HTML
 <div>
     <ul class="items">
@@ -259,7 +275,6 @@ We can see the **subscribe** operator in the above snippet. In **Rxjs** one can 
 ```    
 
 In case you are not aware about how to iterate over **Arrays**, **Map**, **Set** you can have a quick read [here](http://namitamalik.github.io/NgRepeat-vs-ngFor/).
-
 
 So now our complete `PostsListsComponent` would look like:
 
@@ -299,7 +314,8 @@ export class PostsListsComponent {
 
 We have completed all the pending stuff and now we should be able to see list of posts.
 
-But before we end this post, let's have a look at one for operator i.e. **toPromise**. This **operator** converts an **Observable** sequence to a **promise**. So if we use promises, then our `posts-data.service.ts` would look like:
+But before we end this post, let's have a look at one for operator i.e. **toPromise**. This **operator** converts an **Observable** 
+sequence to a **promise**. So if we use promises, then our `posts-data.service.ts` would look like:
 
 ```TypeScript
 import {Injectable} from "@angular/core";

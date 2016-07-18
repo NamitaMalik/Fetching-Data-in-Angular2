@@ -12,7 +12,7 @@ import './rxjs-operators';
       <h1>Fetching:</h1>
       <posts-parent></posts-parent>
     `,
-    directives:[PostsComponent]
+    directives: <any>[PostsComponent]
 })
 
 export class AppComponent {
