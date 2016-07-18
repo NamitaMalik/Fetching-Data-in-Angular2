@@ -7,12 +7,13 @@ import {PostsListsComponent} from './posts-lists.component';
 import {PostsDataService} from './posts-data.service';
 
 @Component({
-    selector:'posts-parent',
-    template:  `
+    selector: 'posts-parent',
+    template: `
     <h2>View Posts</h2>
     <posts-list></posts-list>
   `,
-    directives:[PostsListsComponent],
-    providers: [PostsDataService]
+    directives: <any>[PostsListsComponent],
+    providers: <any>[PostsDataService]
 })
-export class PostsComponent { }
+export class PostsComponent {
+}
