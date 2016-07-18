@@ -154,48 +154,45 @@ Now, let's start one by one:
 
 1. First, we need to import **Http** and **Response** from `@angular/http` and also need to import **Observable** from `rxjs/Observable`.
 So our `posts-data.service.ts` would now be:
-
-```TypeScript
-import {Injectable} from "@angular/core";
-import {PostsData} from './posts-data';
-import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
-
-@Injectable()
-export class PostsDataService {
-}
-```
+    ```TypeScript
+    import {Injectable} from "@angular/core";
+    import {PostsData} from './posts-data';
+    import { Http, Response } from '@angular/http';
+    import { Observable } from 'rxjs/Observable';
+    
+    @Injectable()
+    export class PostsDataService {
+    }
+    ```
 
 2. We need to use a few operators in our `getData()` function so we need to import them. Instead of importing all the operators let's import the required ones 
 in `rxjs-operators.ts` and then import this into our `app.component.ts`. So our `app.component.ts` would now be:
- 
-```TypeScript
-import {Component} from '@angular/core';
-import {PostsComponent} from './posts/post.component'
-import './rxjs-operators';
+    ```TypeScript
+    import {Component} from '@angular/core';
+    import {PostsComponent} from './posts/post.component'
+    import './rxjs-operators';
+    
+    @Component({
+        selector: 'my-app',
+        template: `
+          <h1>Fetching:</h1>
+          <posts-parent></posts-parent>
+        `,
+        directives:[PostsComponent]
+    })
+    
+    export class AppComponent {
+    }
+    ```
 
-@Component({
-    selector: 'my-app',
-    template: `
-      <h1>Fetching:</h1>
-      <posts-parent></posts-parent>
-    `,
-    directives:[PostsComponent]
-})
-
-export class AppComponent {
-}
-```
- 
 3. Now, we need to have a `getData()` function which will get posts from the api. So here is what our `getData()` function should be like:
-
-```TypeScript
-getData (): Observable<PostsData[]> {
-   return this.http.get('http://jsonplaceholder.typicode.com/posts/')
-       .map(this.extractData)
-       .catch(this.handleError);
-}
-```
+    ```TypeScript
+    getData (): Observable<PostsData[]> {
+       return this.http.get('http://jsonplaceholder.typicode.com/posts/')
+           .map(this.extractData)
+           .catch(this.handleError);
+    }
+    ```
 
 The api http://jsonplaceholder.typicode.com/posts/ returns us an array of posts data whereas our `http.get` would return us an **Observable**.
 We then use the **map** operator which transforms the response emitted by Observable by applying a function to it. So in case of success, our flow 
@@ -252,26 +249,26 @@ We should note that the above **Observable** is a **cold observable**. So one ha
 Now, let's move back to the `PostsListsComponent` and complete our pending stuff:
 
 1. We will first add definition part to our `getPosts()` function:
-```TypeScript
-getPosts() {
-    this._postsDataService.getData()
-        .subscribe(
-            posts => this.postsData=posts,
-            error =>  this.errorMessage = <any>error);
-}
-```    
+    ```TypeScript
+    getPosts() {
+        this._postsDataService.getData()
+            .subscribe(
+                posts => this.postsData=posts,
+                error =>  this.errorMessage = <any>error);
+    }
+    ```    
 
-We can see the **subscribe** operator in the above snippet. In **Rxjs** one can **subscribe** to an **Observable** by passing 0 to 3 individual 
-functions `onNext`, `onError` and `onCompleted`.
+    We can see the **subscribe** operator in the above snippet. In **Rxjs** one can **subscribe** to an **Observable** by passing 0 to 3 individual 
+    functions `onNext`, `onError` and `onCompleted`.
 
 2. Now, we need to display the fetched `posts` in this `PostsListsComponent`. So our template would like:
-```HTML
-<div>
-    <ul class="items">
-    <li *ngFor="let postData of postsData">
-    <span>{{postData.title}}</span></li>
-    </ul>
-</div>
+    ```HTML
+    <div>
+        <ul class="items">
+        <li *ngFor="let postData of postsData">
+        <span>{{postData.title}}</span></li>
+        </ul>
+    </div>
 ```    
 
 In case you are not aware about how to iterate over **Arrays**, **Map**, **Set** you can have a quick read [here](http://namitamalik.github.io/NgRepeat-vs-ngFor/).
