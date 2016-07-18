@@ -384,3 +384,13 @@ export class PostsListsComponent {
 
 As promised this blog educated us on fetching data in **Angular2** We are yet to see how to post data to a server in **Angular2** so stay tuned! till then Happy Learning!
 
+Follow Me
+---
+[Github](https://github.com/NamitaMalik)
+
+[Twitter](https://twitter.com/namita13_04)
+
+[LinkedIn](https://in.linkedin.com/in/namita-malik-a7885b23)
+
+[More Blogs By Me](https://namitamalik.github.io/)
+
