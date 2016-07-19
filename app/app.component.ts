@@ -1,7 +1,6 @@
 /**
  * Created by namita on 7/15/16.
  */
-
 import {Component} from '@angular/core';
 import {PostsComponent} from './posts/post.component'
 import './rxjs-operators';
