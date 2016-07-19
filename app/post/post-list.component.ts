@@ -29,9 +29,7 @@ export class PostListComponent {
     getPosts() {
         this._postDataService.getData()
             .subscribe(
-                (posts) => {
-                    this.posts = posts
-                },
+                posts => this.posts = posts,
                 error => this.errorMessage = <any>error);
     }
 }

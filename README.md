@@ -48,8 +48,8 @@ Let's now move back the original agenda of this blog i.e. fetching data using **
 To achieve the above scenario let's break this small app into parts:
 
 1. `AppComponent` - This is parent component for our application.
-2. `PostComponent` - This is child component inside our `AppComponent`. It will currently have `PostListsComponent` as its child component. Tomorrow, if we plan to display the detail of a post, we may add **PostDetailComponent** to display the details.
-3. `Post` - We make `Post` **interface** to define the type of that we will receive from the **GET** api.
+2. `PostComponent` - This is child component inside our `AppComponent`. It will currently have `PostListComponent` as its child component. Tomorrow, if we plan to display the detail of a post, we may add **PostDetailComponent** to display the details.
+3. `Post` - We make `Post` **interface** to define the type of element that we will receive from the **GET** api.
 4. `PostService` - This service will actually fetch the data via making **GET** call on the api for us.
 
 Here is our `app.component.ts`:
@@ -106,7 +106,7 @@ export interface Post {
 }
 ```
 
-Now, let's have a look at our `post-lists.component.ts` which exports the `PostListComponent`:
+Now, let's have a look at our `post-list.component.ts` which exports the `PostListComponent`:
 
 ```TypeScript
 import {Component} from '@angular/core';
@@ -114,20 +114,20 @@ import {PostService} from './post.service';
 import {Post} from './post';
 
 @Component({
-    selector:'post-list',
+    selector: 'post-list',
     template: `
-    <div>
-    </div>
+        <div>
+        </div>
     `
 })
 
 export class PostListComponent {
-    constructor(private _postService: PostService) {
+    constructor(private _postDataService:PostService) {
         this.getPosts();
     }
 
-    private post:Post[]=[];
-    private errorMessage:any='';
+    private posts:Post[] = [];
+    private errorMessage:any = '';
 
     getPosts() {
         //To Do: Fetch Posts here using PostsDataService
@@ -168,6 +168,14 @@ So our `post.service.ts` would now be:
 
 2. We need to use a few operators in our `getData()` function so we need to import them. Instead of importing all the operators let's import the required ones 
 in `rxjs-operators.ts` and then import this into our `app.component.ts`. So our `app.component.ts` would now be:
+    **rxjs-operators.ts**:
+    ```TypeScript
+    import 'rxjs/add/operator/catch';
+    import 'rxjs/add/operator/map';
+    import 'rxjs/add/operator/toPromise';
+    ```
+    
+    **app.components.ts**:
     ```TypeScript
     import {Component} from '@angular/core';
     import {PostComponent} from './post/post.component'
@@ -188,19 +196,19 @@ in `rxjs-operators.ts` and then import this into our `app.component.ts`. So our 
 
 3. Now, we need to have a `getData()` function which will get posts from the api. So here is what our `getData()` function should be like:
     ```TypeScript
-    getData (): Observable<Post[]> {
-       return this.http.get('http://jsonplaceholder.typicode.com/posts/')
-           .map(this.extractData)
-           .catch(this.handleError);
+    getData():Observable<Post[]> {
+        return this.http.get('http://jsonplaceholder.typicode.com/posts/')
+            .map(this.extractData)
+            .catch(this.handleError);
     }
     ```
 
-The api http://jsonplaceholder.typicode.com/posts/ returns us an array of posts data whereas our `http.get` would return us an **Observable**.
+The api http://jsonplaceholder.typicode.com/posts/ returns us an array of post whereas our `http.get` would return us an **Observable**.
 We then use the **map** operator which transforms the response emitted by Observable by applying a function to it. So in case of success, our flow 
 would now move to `extractData()` function, which is:
 
 ```TypeScript
-private extractData(res: Response) {
+private extractData(res:Response) {
     let body = res.json();
     return body || [];
 }
@@ -212,8 +220,12 @@ But in case, we had encountered error, our flow would have moved to `catch` oper
 from **Observable** and continues the sequence without error. `handleError()` function would have come into play in that case:
 
 ```TypeScript
-private handleError (error: any) {
-    let errMsg = (error.message) ? error.message : error.status ? `${error.status} - ${error.statusText}` : 'Server error';
+private handleError(error:any) {
+    // In a real world app, we might use a remote logging infrastructure
+    // We'd also dig deeper into the error to get a better message
+    let errMsg = (error.message) ? error.message :
+        error.status ? `${error.status} - ${error.statusText}` : 'Server error';
+    console.error(errMsg); // log to console instead
     return Observable.throw(errMsg);
 }
 ```
@@ -222,24 +234,32 @@ After joining all the parts, our `post.service.ts` would look like:
 
 ```TypeScript
 import {Injectable} from "@angular/core";
+import {Http, Response} from '@angular/http';
+import {Observable} from 'rxjs/Observable';
 import {Post} from './post';
-import { Http, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
 
 @Injectable()
 export class PostService {
-    constructor (private http: Http) {}
-    getData (): Observable<Post[]> {
+    constructor(private http:Http) {
+    }
+
+    getData():Observable<Post[]> {
         return this.http.get('http://jsonplaceholder.typicode.com/posts/')
             .map(this.extractData)
             .catch(this.handleError);
     }
-    private extractData(res: Response) {
+
+    private extractData(res:Response) {
         let body = res.json();
         return body || [];
     }
-    private handleError (error: any) {
-        let errMsg = (error.message) ? error.message : error.status ? `${error.status} - ${error.statusText}` : 'Server error';
+
+    private handleError(error:any) {
+        // In a real world app, we might use a remote logging infrastructure
+        // We'd also dig deeper into the error to get a better message
+        let errMsg = (error.message) ? error.message :
+            error.status ? `${error.status} - ${error.statusText}` : 'Server error';
+        console.error(errMsg); // log to console instead
         return Observable.throw(errMsg);
     }
 }
@@ -247,34 +267,35 @@ export class PostService {
 
 We should note that the above **Observable** is a **cold observable**. So one has to **subscribe** to it.
 
-Now, let's move back to the `PostListsComponent` and complete our pending stuff:
+Now, let's move back to the `PostListComponent` and complete our pending stuff:
 
 1. We will first add definition part to our `getPosts()` function:
     ```TypeScript
     getPosts() {
-        this._postService.getData()
+        this._postDataService.getData()
             .subscribe(
-                posts => this.post=posts,
-                error =>  this.errorMessage = <any>error);
+                posts => this.posts = posts,
+                error => this.errorMessage = <any>error);
     }
     ```    
 
     We can see the **subscribe** operator in the above snippet. In **Rxjs** one can **subscribe** to an **Observable** by passing 0 to 3 individual 
     functions `onNext`, `onError` and `onCompleted`.
 
-2. Now, we need to display the fetched `post` in this `PostListsComponent`. So our template would like:
+2. Now, we need to display the fetched `post` in this `PostListComponent`. So our template would like:
     ```HTML
     <div>
         <ul class="items">
-        <li *ngFor="let post of posts">
-        <span>{{post.title}}</span></li>
+            <li *ngFor="let post of posts">
+                <span>{{post.title}}</span>
+            </li>
         </ul>
     </div>
-```    
+    ```    
 
 In case you are not aware about how to iterate over **Arrays**, **Map**, **Set** you can have a quick read [here](http://namitamalik.github.io/NgRepeat-vs-ngFor/).
 
-So now our complete `PostListsComponent` would look like:
+So now our complete `PostListComponent` would look like:
 
 ```TypeScript
 import {Component} from '@angular/core';
@@ -282,38 +303,39 @@ import {PostService} from './post.service';
 import {Post} from './post';
 
 @Component({
-    selector:'post-list',
+    selector: 'post-list',
     template: `
-    <div>
-        <ul class="items">
-        <li *ngFor="let post of post">
-        <span>{{post.title}}</span></li>
-        </ul>
-    </div>
+        <div>
+            <ul class="items">
+                <li *ngFor="let post of posts">
+                    <span>{{post.title}}</span>
+                </li>
+            </ul>
+        </div>
     `
 })
 
 export class PostListComponent {
-    constructor(private _postService: PostService) {
+    constructor(private _postDataService:PostService) {
         this.getPosts();
     }
 
-    private posts:Post[]=[];
-    private errorMessage:any='';
+    private posts:Post[] = [];
+    private errorMessage:any = '';
 
     getPosts() {
-        this._postService.getData()
+        this._postDataService.getData()
             .subscribe(
-                posts => this.posts=posts,
-                error =>  this.errorMessage = <any>error);
+                posts => this.posts = posts,
+                error => this.errorMessage = <any>error);
     }
 }
 ```
 
 We have completed all the pending stuff and now we should be able to see list of post.
 
-But before we end this post, let's have a look at one for operator i.e. **toPromise**. This **operator** converts an **Observable** 
-sequence to a **promise**. So if we use promises, then our `posts-data.service.ts` would look like:
+But before we end this post, let's have a look at one more operator i.e. **toPromise**. This **operator** converts an **Observable** 
+sequence to a **promise**. So if we use promises, then our `post.service.ts` would look like:
 
 ```TypeScript
 import {Injectable} from "@angular/core";
@@ -347,7 +369,7 @@ export class PostService {
 
 If you could notice the difference, we have moved `this.extractData` which is the **success callback** as the first parameter whereas `this.errorHandler` is the second parameter.
 
-Since we are now using **promises** we will also have to make tweaks in `posts-lists.component.ts`. We will have to call `then` on the  returned promise instead of `subscribe`.
+Since we are now using **promises** we will also have to make tweaks in `post-list.component.ts`. We will have to call `then` on the returned promise instead of `subscribe`.
 
 ```TypeScript
 import {Component} from '@angular/core';
@@ -355,35 +377,36 @@ import {PostService} from './post.service';
 import {Post} from './post';
 
 @Component({
-    selector:'post-list',
+    selector: 'post-list',
     template: `
-    <div>
-        <ul class="items">
-        <li *ngFor="let post of posts">
-        <span>{{post.title}}</span></li>
-        </ul>
-    </div>
+        <div>
+            <ul class="items">
+                <li *ngFor="let post of posts">
+                    <span>{{post.title}}</span>
+                </li>
+            </ul>
+        </div>
     `
 })
 
 export class PostListComponent {
-    constructor(private _postService: PostService) {
+    constructor(private _postDataService:PostService) {
         this.getPosts();
     }
 
-    private post:Post[]=[];
-    private errorMessage:any='';
+    private posts:Post[] = [];
+    private errorMessage:any = '';
 
     getPosts() {
-        this._postService.getData()
+        this._postDataService.getData()
             .then(
-                posts => this.post=posts,
-                error =>  this.errorMessage = <any>error);
+                posts => this.posts = posts,
+                error => this.errorMessage = <any>error);
     }
 }
 ```
 
-As promised this blog educated us on fetching data in **Angular2** We are yet to see how to post data to a server in **Angular2** so stay tuned! till then Happy Learning!
+As promised this blog educated us on fetching data in **Angular2** We are yet to see how to post data to a server in **Angular2** so stay tuned! Till then Happy Learning!
 
 Follow Me
 ---
