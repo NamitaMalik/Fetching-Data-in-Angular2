@@ -14,12 +14,12 @@ $http({method: 'GET', url: '/someUrl'})
 
 As it can be seen above, **$http** returns a **promise** where we register two callbacks for **success** and **error**.
 
-Now, let's move on to **Angular2**, and see how stuff works in it. **Angular2** has **Http** service which is used to make **get** calls to server. But an important thing to note here is that though **$http** service in **Angular1.x** returned a **promise**, **Http** service in **Angular2** returns **Observables**.
+Now, let's move on to **Angular2**, and see how stuff works in it. **Angular2** has **Http** service which is used to make **get** calls to server. But an important thing to note here is that though **$http** service in **Angular1.x** returned a **promise** while  **Http** service in **Angular2** returns **Observables**.
 
 So, before we dive deeper into **Http** service, let's quickly have a glimpse at **Observables**:
 
-To start off with, Observables are nothing but a stream of data.These data streams can be of anything - a stream of variables, properties, data structures or
-even stream of events. One react to the stream by listening to it. Observables are basically based on **Observer Design Pattern**. In **Observer Design Pattern** one-to-many dependency is maintained between the objects, when one object changes its state all other objects/dependents are notified. These dependents are known as **Observers**.
+To start off with, **Observables** are nothing but a stream of data.These data streams can be of anything - a stream of variables, properties, data structures or
+even stream of events. One react to the stream by listening to it. **Observables** are basically based on **Observer Design Pattern**. In **Observer Design Pattern** one-to-many dependency is maintained between the objects, when one object changes its state all other objects/dependents are notified. These dependents are known as **Observers**.
 
 A stream can emit 3 different things:
 
@@ -47,52 +47,53 @@ Let's now move back the original agenda of this blog i.e. fetching data using **
 
 To achieve the above scenario let's break this small app into parts:
 
-1. `AppComponent` - This the parent component for our application.
-2. `PostsComponent` - This the child component inside our `AppComponent`. It will currently have `PostsListsComponent` as its child component. Tomorrow, if we plan to display the detail of a post, we may add **PostsDetailComponent** to display the details.
+1. `AppComponent` - This is parent component for our application.
+2. `PostsComponent` - This is child component inside our `AppComponent`. It will currently have `PostsListsComponent` as its child component. Tomorrow, if we plan to display the detail of a post, we may add **PostsDetailComponent** to display the details.
 3. `PostsData` - We make `PostsData` **interface** to define the type of that we will receive from the **GET** api.
-4. `PostsDataService` - This service will actually fetch the data from the **GET** api for us.
+4. `PostsDataService` - This service will actually fetch the data via making **GET** call on the api for us.
 
 Here is our `app.component.ts`:
 
 ```TypeScript
 import {Component} from '@angular/core';
 import {PostsComponent} from './posts/post.component'
+import './rxjs-operators';
 
 @Component({
     selector: 'my-app',
     template: `
-      <h1>Fetching:</h1>
-      <posts-parent></posts-parent>
+        <h1>Fetching:</h1>
+        <posts-parent></posts-parent>
     `,
-    directives:[PostsComponent]
+    directives: <any>[PostsComponent]
 })
 
 export class AppComponent {
 }
 ```
    
-and here is the `posts.component.ts`:
+and here is the `post.component.ts`:
 
 ```TypeScript
 import {Component}  from '@angular/core';
 import {PostsListsComponent} from './posts-lists.component';
 import {PostsDataService} from './posts-data.service';
-   
+
 @Component({
-   selector:'posts-parent',
-   template:  `
-       <h2>View Posts</h2>
-       <posts-list></posts-list>
-     `,
-     directives:[PostsListsComponent],
-     providers: [PostsDataService]
+    selector: 'posts-parent',
+    template: `
+        <h2>View Posts</h2>
+        <posts-list></posts-list>
+    `,
+    directives: <any>[PostsListsComponent],
+    providers: <any>[PostsDataService]
 })
 export class PostsComponent {
 }
 ```
 
 We have injected `PostsDataService`. We register it as a provider by doing `providers:[PostsDataService]` so that its instance is available to all the child components of `PostsComponent`.
-In case you are not aware about the **Angular2** Services, you can have a quick read [Services in Angular2](http://namitamalik.github.io/Services-in-Angular2/)
+In case you are not aware about the **Angular2** **Services**, you can have a quick read [Services in Angular2](http://namitamalik.github.io/Services-in-Angular2/).
 
 Let's see the `posts-data.ts`, where we define the `PostsData`:
 
@@ -393,4 +394,3 @@ Follow Me
 [LinkedIn](https://in.linkedin.com/in/namita-malik-a7885b23)
 
 [More Blogs By Me](https://namitamalik.github.io/)
-

@@ -8,8 +8,8 @@ import './rxjs-operators';
 @Component({
     selector: 'my-app',
     template: `
-      <h1>Fetching:</h1>
-      <posts-parent></posts-parent>
+        <h1>Fetching:</h1>
+        <posts-parent></posts-parent>
     `,
     directives: <any>[PostsComponent]
 })

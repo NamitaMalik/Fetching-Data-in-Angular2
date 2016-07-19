@@ -8,12 +8,12 @@ import {PostsData} from './posts-data';
 @Component({
     selector: 'posts-list',
     template: `
-    <div>
-        <ul class="items">
-        <li *ngFor="let postData of postsData">
-            <span>{{postData.title}}</span></li>
-        </ul>
-    </div>
+        <div>
+            <ul class="items">
+            <li *ngFor="let postData of postsData">
+                <span>{{postData.title}}</span></li>
+            </ul>
+        </div>
     `
 })
 
