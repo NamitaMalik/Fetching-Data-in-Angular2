@@ -2,8 +2,8 @@
  * Created by namita on 7/15/16.
  */
 import {Component} from '@angular/core';
-import {PostDataService} from './post-data.service';
-import {Post} from './post-data';
+import {PostService} from './post.service';
+import {Post} from './post';
 
 @Component({
     selector: 'post-list',
@@ -19,7 +19,7 @@ import {Post} from './post-data';
 })
 
 export class PostListComponent {
-    constructor(private _postDataService:PostDataService) {
+    constructor(private _postDataService:PostService) {
         this.getPosts();
     }
 

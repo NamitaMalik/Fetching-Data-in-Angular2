@@ -3,7 +3,7 @@
  */
 import {Component}  from '@angular/core';
 import {PostListComponent} from './post-list.component';
-import {PostDataService} from './post-data.service';
+import {PostService} from './post.service';
 
 @Component({
     selector: 'post-parent',
@@ -12,7 +12,7 @@ import {PostDataService} from './post-data.service';
         <post-list></post-list>
     `,
     directives: <any>[PostListComponent],
-    providers: <any>[PostDataService]
+    providers: <any>[PostService]
 })
 export class PostComponent {
 }

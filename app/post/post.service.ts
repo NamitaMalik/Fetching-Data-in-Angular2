@@ -4,10 +4,10 @@
 import {Injectable} from "@angular/core";
 import {Http, Response} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
-import {Post} from './post-data';
+import {Post} from './post';
 
 @Injectable()
-export class PostDataService {
+export class PostService {
     constructor(private http:Http) {
     }
 
