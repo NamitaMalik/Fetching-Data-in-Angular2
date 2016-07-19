@@ -4,14 +4,14 @@
 import {Injectable} from "@angular/core";
 import {Http, Response} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
-import {PostData} from './post-data';
+import {Post} from './post-data';
 
 @Injectable()
 export class PostDataService {
     constructor(private http:Http) {
     }
 
-    getData():Observable<PostData[]> {
+    getData():Observable<Post[]> {
         return this.http.get('http://jsonplaceholder.typicode.com/posts/')
             .map(this.extractData)
             .catch(this.handleError);

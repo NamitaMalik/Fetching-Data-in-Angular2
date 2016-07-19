@@ -3,7 +3,7 @@
  */
 import {Component} from '@angular/core';
 import {PostDataService} from './post-data.service';
-import {PostData} from './post-data';
+import {Post} from './post-data';
 
 @Component({
     selector: 'post-list',
@@ -23,7 +23,7 @@ export class PostListComponent {
         this.getPosts();
     }
 
-    private posts:PostData[] = [];
+    private posts:Post[] = [];
     private errorMessage:any = '';
 
     getPosts() {
