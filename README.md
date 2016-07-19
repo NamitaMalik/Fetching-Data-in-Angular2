@@ -43,29 +43,29 @@ Well, the above discussion is not even a tip of the iceberg on a subject such as
 
 Let's now move back the original agenda of this blog i.e. fetching data using **Http** service. Here is a sample use case:
 
-> We need to display a list of posts. The list of posts can be fetched through this API - http://jsonplaceholder.typicode.com/posts/.
+> We need to display a list of post. The list of post can be fetched through this API - http://jsonplaceholder.typicode.com/posts/.
 
 To achieve the above scenario let's break this small app into parts:
 
 1. `AppComponent` - This is parent component for our application.
-2. `PostsComponent` - This is child component inside our `AppComponent`. It will currently have `PostsListsComponent` as its child component. Tomorrow, if we plan to display the detail of a post, we may add **PostsDetailComponent** to display the details.
-3. `PostsData` - We make `PostsData` **interface** to define the type of that we will receive from the **GET** api.
-4. `PostsDataService` - This service will actually fetch the data via making **GET** call on the api for us.
+2. `PostComponent` - This is child component inside our `AppComponent`. It will currently have `PostListsComponent` as its child component. Tomorrow, if we plan to display the detail of a post, we may add **PostDetailComponent** to display the details.
+3. `Post` - We make `Post` **interface** to define the type of that we will receive from the **GET** api.
+4. `PostService` - This service will actually fetch the data via making **GET** call on the api for us.
 
 Here is our `app.component.ts`:
 
 ```TypeScript
 import {Component} from '@angular/core';
-import {PostsComponent} from './posts/post.component'
+import {PostComponent} from './post/post.component'
 import './rxjs-operators';
 
 @Component({
     selector: 'my-app',
     template: `
         <h1>Fetching:</h1>
-        <posts-parent></posts-parent>
+        <post-parent></post-parent>
     `,
-    directives: <any>[PostsComponent]
+    directives: <any>[PostComponent]
 })
 
 export class AppComponent {
@@ -76,29 +76,29 @@ and here is the `post.component.ts`:
 
 ```TypeScript
 import {Component}  from '@angular/core';
-import {PostsListsComponent} from './posts-lists.component';
-import {PostsDataService} from './posts-data.service';
+import {PostListComponent} from './post-list.component';
+import {PostService} from './post.service';
 
 @Component({
-    selector: 'posts-parent',
+    selector: 'post-parent',
     template: `
         <h2>View Posts</h2>
-        <posts-list></posts-list>
+        <post-list></post-list>
     `,
-    directives: <any>[PostsListsComponent],
-    providers: <any>[PostsDataService]
+    directives: <any>[PostListComponent],
+    providers: <any>[PostService]
 })
-export class PostsComponent {
+export class PostComponent {
 }
 ```
 
-We have injected `PostsDataService`. We register it as a provider by doing `providers:[PostsDataService]` so that its instance is available to all the child components of `PostsComponent`.
+We have injected `PostService`. We register it as a provider by doing `providers:[PostService]` so that its instance is available to all the child components of `PostComponent`.
 In case you are not aware about the **Angular2** **Services**, you can have a quick read [Services in Angular2](http://namitamalik.github.io/Services-in-Angular2/).
 
-Let's see the `posts-data.ts`, where we define the `PostsData`:
+Let's see the `post.ts`, where we define the `Post`:
 
 ```TypeScript
-export interface PostsData {
+export interface Post {
     userId:number;
     id:number;
     title:string;
@@ -106,27 +106,27 @@ export interface PostsData {
 }
 ```
 
-Now, let's have a look at our `posts-lists.component.ts` which exports the `PostsListsComponent`:
+Now, let's have a look at our `post-lists.component.ts` which exports the `PostListComponent`:
 
 ```TypeScript
 import {Component} from '@angular/core';
-import {PostsDataService} from './posts-data.service';
-import {PostsData} from './posts-data';
+import {PostService} from './post.service';
+import {Post} from './post';
 
 @Component({
-    selector:'posts-list',
+    selector:'post-list',
     template: `
     <div>
     </div>
     `
 })
 
-export class PostsListsComponent {
-    constructor(private _postsDataService: PostsDataService) {
+export class PostListComponent {
+    constructor(private _postService: PostService) {
         this.getPosts();
     }
 
-    private postsData:PostsData[]=[];
+    private post:Post[]=[];
     private errorMessage:any='';
 
     getPosts() {
@@ -137,32 +137,32 @@ export class PostsListsComponent {
 
 Couple of most important tasks are still pending in the above component:
 
-1. We haven't yet written any code to display the list of posts.
-2. We still need to fetch the data from server using the `PostsDataService` i.e. the definition part of the `getPosts()` function.
+1. We haven't yet written any code to display the list of post.
+2. We still need to fetch the data from server using the `PostService` i.e. the definition part of the `getPosts()` function.
 
-So, let's move to the `posts-data.service.ts` where a lot of action will actually take place:
+So, let's move to the `post.service.ts` where a lot of action will actually take place:
 
 ```TypeScript
 import {Injectable} from "@angular/core";
-import {PostsData} from './posts-data';
+import {Post} from './post';
 
 @Injectable()
-export class PostsDataService {
+export class PostService {
 }
 ```
 
 Now, let's start one by one:
 
 1. First, we need to import **Http** and **Response** from `@angular/http` and also need to import **Observable** from `rxjs/Observable`.
-So our `posts-data.service.ts` would now be:
+So our `post.service.ts` would now be:
     ```TypeScript
     import {Injectable} from "@angular/core";
-    import {PostsData} from './posts-data';
+    import {Post} from './post';
     import { Http, Response } from '@angular/http';
     import { Observable } from 'rxjs/Observable';
     
     @Injectable()
-    export class PostsDataService {
+    export class PostService {
     }
     ```
 
@@ -170,16 +170,16 @@ So our `posts-data.service.ts` would now be:
 in `rxjs-operators.ts` and then import this into our `app.component.ts`. So our `app.component.ts` would now be:
     ```TypeScript
     import {Component} from '@angular/core';
-    import {PostsComponent} from './posts/post.component'
+    import {PostComponent} from './post/post.component'
     import './rxjs-operators';
     
     @Component({
         selector: 'my-app',
         template: `
           <h1>Fetching:</h1>
-          <posts-parent></posts-parent>
+          <post-parent></post-parent>
         `,
-        directives:[PostsComponent]
+        directives:[PostComponent]
     })
     
     export class AppComponent {
@@ -188,7 +188,7 @@ in `rxjs-operators.ts` and then import this into our `app.component.ts`. So our 
 
 3. Now, we need to have a `getData()` function which will get posts from the api. So here is what our `getData()` function should be like:
     ```TypeScript
-    getData (): Observable<PostsData[]> {
+    getData (): Observable<Post[]> {
        return this.http.get('http://jsonplaceholder.typicode.com/posts/')
            .map(this.extractData)
            .catch(this.handleError);
@@ -218,18 +218,18 @@ private handleError (error: any) {
 }
 ```
 
-After joining all the parts, our `posts-data.services.ts` would look like:
+After joining all the parts, our `post.service.ts` would look like:
 
 ```TypeScript
 import {Injectable} from "@angular/core";
-import {PostsData} from './posts-data';
+import {Post} from './post';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()
-export class PostsDataService {
+export class PostService {
     constructor (private http: Http) {}
-    getData (): Observable<PostsData[]> {
+    getData (): Observable<Post[]> {
         return this.http.get('http://jsonplaceholder.typicode.com/posts/')
             .map(this.extractData)
             .catch(this.handleError);
@@ -247,14 +247,14 @@ export class PostsDataService {
 
 We should note that the above **Observable** is a **cold observable**. So one has to **subscribe** to it.
 
-Now, let's move back to the `PostsListsComponent` and complete our pending stuff:
+Now, let's move back to the `PostListsComponent` and complete our pending stuff:
 
 1. We will first add definition part to our `getPosts()` function:
     ```TypeScript
     getPosts() {
-        this._postsDataService.getData()
+        this._postService.getData()
             .subscribe(
-                posts => this.postsData=posts,
+                posts => this.post=posts,
                 error =>  this.errorMessage = <any>error);
     }
     ```    
@@ -262,69 +262,69 @@ Now, let's move back to the `PostsListsComponent` and complete our pending stuff
     We can see the **subscribe** operator in the above snippet. In **Rxjs** one can **subscribe** to an **Observable** by passing 0 to 3 individual 
     functions `onNext`, `onError` and `onCompleted`.
 
-2. Now, we need to display the fetched `posts` in this `PostsListsComponent`. So our template would like:
+2. Now, we need to display the fetched `post` in this `PostListsComponent`. So our template would like:
     ```HTML
     <div>
         <ul class="items">
-        <li *ngFor="let postData of postsData">
-        <span>{{postData.title}}</span></li>
+        <li *ngFor="let post of posts">
+        <span>{{post.title}}</span></li>
         </ul>
     </div>
 ```    
 
 In case you are not aware about how to iterate over **Arrays**, **Map**, **Set** you can have a quick read [here](http://namitamalik.github.io/NgRepeat-vs-ngFor/).
 
-So now our complete `PostsListsComponent` would look like:
+So now our complete `PostListsComponent` would look like:
 
 ```TypeScript
 import {Component} from '@angular/core';
-import {PostsDataService} from './posts-data.service';
-import {PostsData} from './posts-data';
+import {PostService} from './post.service';
+import {Post} from './post';
 
 @Component({
-    selector:'posts-list',
+    selector:'post-list',
     template: `
     <div>
         <ul class="items">
-        <li *ngFor="let postData of postsData">
-        <span>{{postData.title}}</span></li>
+        <li *ngFor="let post of post">
+        <span>{{post.title}}</span></li>
         </ul>
     </div>
     `
 })
 
-export class PostsListsComponent {
-    constructor(private _postsDataService: PostsDataService) {
+export class PostListComponent {
+    constructor(private _postService: PostService) {
         this.getPosts();
     }
 
-    private postsData:PostsData[]=[];
+    private posts:Post[]=[];
     private errorMessage:any='';
 
     getPosts() {
-        this._postsDataService.getData()
+        this._postService.getData()
             .subscribe(
-                posts => this.postsData=posts,
+                posts => this.posts=posts,
                 error =>  this.errorMessage = <any>error);
     }
 }
 ```
 
-We have completed all the pending stuff and now we should be able to see list of posts.
+We have completed all the pending stuff and now we should be able to see list of post.
 
 But before we end this post, let's have a look at one for operator i.e. **toPromise**. This **operator** converts an **Observable** 
 sequence to a **promise**. So if we use promises, then our `posts-data.service.ts` would look like:
 
 ```TypeScript
 import {Injectable} from "@angular/core";
-import {PostsData} from './posts-data';
+import {Post} from './post';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 
 @Injectable()
-export class PostsDataService {
+export class PostService {
     constructor (private http: Http) {}
-    getData (): Promise<PostsData[]> {
+    getData (): Promise<Post[]> {
         return this.http.get('http://jsonplaceholder.typicode.com/posts/')
             .toPromise()
             .then(this.extractData)
@@ -351,33 +351,33 @@ Since we are now using **promises** we will also have to make tweaks in `posts-l
 
 ```TypeScript
 import {Component} from '@angular/core';
-import {PostsDataService} from './posts-data.service';
-import {PostsData} from './posts-data';
+import {PostService} from './post.service';
+import {Post} from './post';
 
 @Component({
-    selector:'posts-list',
+    selector:'post-list',
     template: `
     <div>
         <ul class="items">
-        <li *ngFor="let postData of postsData">
-        <span>{{postData.title}}</span></li>
+        <li *ngFor="let post of posts">
+        <span>{{post.title}}</span></li>
         </ul>
     </div>
     `
 })
 
-export class PostsListsComponent {
-    constructor(private _postsDataService: PostsDataService) {
+export class PostListComponent {
+    constructor(private _postService: PostService) {
         this.getPosts();
     }
 
-    private postsData:PostsData[]=[];
+    private post:Post[]=[];
     private errorMessage:any='';
 
     getPosts() {
-        this._postsDataService.getData()
+        this._postService.getData()
             .then(
-                posts => this.postsData=posts,
+                posts => this.post=posts,
                 error =>  this.errorMessage = <any>error);
     }
 }
