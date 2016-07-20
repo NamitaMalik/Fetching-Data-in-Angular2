@@ -34,12 +34,12 @@
 
 <p>As it can be seen above, <strong>$http</strong> returns a <strong>promise</strong> where we register two callbacks for <strong>success</strong> and <strong>error</strong>.</p>
 
-<p>Now, let's move on to <strong>Angular2</strong>, and see how stuff works in it. <strong>Angular2</strong> has <strong>Http</strong> service which is used to make <strong>get</strong> calls to server. But an important thing to note here is that though <strong>$http</strong> service in <strong>Angular1.x</strong> returned a <strong>promise</strong>, <strong>Http</strong> service in <strong>Angular2</strong> returns <strong>Observables</strong>.</p>
+<p>Now, let's move on to <strong>Angular2</strong>, and see how stuff works in it. <strong>Angular2</strong> has <strong>Http</strong> service which is used to make <strong>get</strong> calls to server. But an important thing to note here is that <strong>$http</strong> service in <strong>Angular1.x</strong> returned a <strong>promise</strong> while  <strong>Http</strong> service in <strong>Angular2</strong> returns <strong>Observables</strong>.</p>
 
 <p>So, before we dive deeper into <strong>Http</strong> service, let's quickly have a glimpse at <strong>Observables</strong>:</p>
 
-<p>To start off with, Observables are nothing but a stream of data.These data streams can be of anything - a stream of variables, properties, data structures or
-even stream of events. One react to the stream by listening to it. Observables are basically based on <strong>Observer Design Pattern</strong>. In <strong>Observer Design Pattern</strong> one-to-many dependency is maintained between the objects, when one object changes its state all other objects/dependents are notified. These dependents are known as <strong>Observers</strong>.</p>
+<p>To start off with, <strong>Observables</strong> are nothing but a stream of data.These data streams can be of anything - a stream of variables, properties, data structures or
+even stream of events. One can react to the stream by listening to it. <strong>Observables</strong> are basically based on <strong>Observer Design Pattern</strong>. In <strong>Observer Design Pattern</strong> one-to-many dependency is maintained between the objects, when one object changes its state all other objects/dependents are notified. These dependents are known as <strong>Observers</strong>.</p>
 
 <p>A stream can emit 3 different things:</p>
 
@@ -54,7 +54,7 @@ One can capture these events by using these functions. These functions are known
 
 <p><strong>Observables</strong> can be of two types:</p>
 
-<p><strong>1.Hot</strong> - <strong>Hot observables</strong> are those which produce values even before their subscription gets activated. One can consider <strong>Hot Observables</strong> as live performances. The <strong>hot observable</strong> sequence is shared among each <strong>subscriber</strong>, also each <strong>subscriber</strong> gets the next value 
+<p><strong>1.Hot</strong> - <strong>Hot observables</strong> are those which produce values even before their subscription gets activated. One can consider <strong>Hot Observables</strong> as live performance. The <strong>hot observable</strong> sequence is shared among each <strong>subscriber</strong>, also each <strong>subscriber</strong> gets the next value 
  in the sequence.</p>
 
 <p><strong>2.Cold</strong> - <strong>Cold observables</strong> behave like standard <strong>iterators</strong>. They push values only when we subscribes to them and they reset when we subscribe again. One can consider <strong>Cold Observables</strong> as a movie.</p>
@@ -73,83 +73,84 @@ One can capture these events by using these functions. These functions are known
 
 <ol>
 <li>
-<code>AppComponent</code> - This the parent component for our application.</li>
+<code>AppComponent</code> - This is parent component for our application.</li>
 <li>
-<code>PostsComponent</code> - This the child component inside our <code>AppComponent</code>. It will currently have <code>PostsListsComponent</code> as its child component. Tomorrow, if we plan to display the detail of a post, we may add <strong>PostsDetailComponent</strong> to display the details.</li>
+<code>PostComponent</code> - This is child component inside our <code>AppComponent</code>. It will currently have <code>PostListComponent</code> as its child component. Tomorrow, if we plan to display the detail of a post, we may add <strong>PostDetailComponent</strong> to display the details.</li>
 <li>
-<code>PostsData</code> - We make <code>PostsData</code> <strong>interface</strong> to define the type of that we will receive from the <strong>GET</strong> api.</li>
+<code>Post</code> - We make <code>Post</code> <strong>interface</strong> to define the type of element that we will receive from the <strong>GET</strong> api.</li>
 <li>
-<code>PostsDataService</code> - This service will actually fetch the data from the <strong>GET</strong> api for us.</li>
+<code>PostService</code> - This service will actually fetch the data via making <strong>GET</strong> call on the api for us.</li>
 </ol>
 
 <p>Here is our <code>app.component.ts</code>:</p>
 
 <div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> {Component} <span class="pl-k">from</span> <span class="pl-s">'@angular/core'</span>;
-<span class="pl-k">import</span> {PostsComponent} <span class="pl-k">from</span> <span class="pl-s">'./posts/post.component'</span>
+<span class="pl-k">import</span> {PostComponent} <span class="pl-k">from</span> <span class="pl-s">'./post/post.component'</span>
+<span class="pl-k">import</span> <span class="pl-s">'./rxjs-operators'</span>;
 
 @Component({
     selector: <span class="pl-s">'my-app'</span>,
     template: <span class="pl-s">`</span>
-<span class="pl-s">      &lt;h1&gt;Fetching:&lt;/h1&gt;</span>
-<span class="pl-s">      &lt;posts-parent&gt;&lt;/posts-parent&gt;</span>
+<span class="pl-s">        &lt;h1&gt;Fetching:&lt;/h1&gt;</span>
+<span class="pl-s">        &lt;post-parent&gt;&lt;/post-parent&gt;</span>
 <span class="pl-s">    `</span>,
-    directives:[PostsComponent]
+    directives: &lt;<span class="pl-k">any</span>&gt;[PostComponent]
 })
 
 <span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">AppComponent</span> {
 }</pre></div>
 
-<p>and here is the <code>posts.component.ts</code>:</p>
+<p>and here is the <code>post.component.ts</code>:</p>
 
 <div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> {Component}  <span class="pl-k">from</span> <span class="pl-s">'@angular/core'</span>;
-<span class="pl-k">import</span> {PostsListsComponent} <span class="pl-k">from</span> <span class="pl-s">'./posts-lists.component'</span>;
-<span class="pl-k">import</span> {PostsDataService} <span class="pl-k">from</span> <span class="pl-s">'./posts-data.service'</span>;
+<span class="pl-k">import</span> {PostListComponent} <span class="pl-k">from</span> <span class="pl-s">'./post-list.component'</span>;
+<span class="pl-k">import</span> {PostService} <span class="pl-k">from</span> <span class="pl-s">'./post.service'</span>;
 
 @Component({
-   selector:<span class="pl-s">'posts-parent'</span>,
-   template:  <span class="pl-s">`</span>
-<span class="pl-s">       &lt;h2&gt;View Posts&lt;/h2&gt;</span>
-<span class="pl-s">       &lt;posts-list&gt;&lt;/posts-list&gt;</span>
-<span class="pl-s">     `</span>,
-     directives:[PostsListsComponent],
-     providers: [PostsDataService]
+    selector: <span class="pl-s">'post-parent'</span>,
+    template: <span class="pl-s">`</span>
+<span class="pl-s">        &lt;h2&gt;View Posts&lt;/h2&gt;</span>
+<span class="pl-s">        &lt;post-list&gt;&lt;/post-list&gt;</span>
+<span class="pl-s">    `</span>,
+    directives: &lt;<span class="pl-k">any</span>&gt;[PostListComponent],
+    providers: &lt;<span class="pl-k">any</span>&gt;[PostService]
 })
-<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostsComponent</span> {
+<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostComponent</span> {
 }</pre></div>
 
-<p>We have injected <code>PostsDataService</code>. We register it as a provider by doing <code>providers:[PostsDataService]</code> so that its instance is available to all the child components of <code>PostsComponent</code>.
-In case you are not aware about the <strong>Angular2</strong> Services, you can have a quick read <a href="http://namitamalik.github.io/Services-in-Angular2/">Services in Angular2</a></p>
+<p>We have injected <code>PostService</code>. We register it as a provider by doing <code>providers:[PostService]</code> so that its instance is available to all the child components of <code>PostComponent</code>.
+In case you are not aware about the <strong>Angular2</strong> <strong>Services</strong>, you can have a quick read <a href="http://namitamalik.github.io/Services-in-Angular2/">Services in Angular2</a>.</p>
 
-<p>Let's see the <code>posts-data.ts</code>, where we define the <code>PostsData</code>:</p>
+<p>Let's see the <code>post.ts</code>, where we define the <code>Post</code>:</p>
 
-<div class="highlight highlight-source-ts"><pre><span class="pl-k">export</span> <span class="pl-k">interface</span> <span class="pl-en">PostsData</span> {
+<div class="highlight highlight-source-ts"><pre><span class="pl-k">export</span> <span class="pl-k">interface</span> <span class="pl-en">Post</span> {
     <span class="pl-v">userId</span>:<span class="pl-k">number</span>;
     <span class="pl-v">id</span>:<span class="pl-k">number</span>;
     <span class="pl-v">title</span>:<span class="pl-k">string</span>;
     <span class="pl-v">body</span>:<span class="pl-k">string</span>
 }</pre></div>
 
-<p>Now, let's have a look at our <code>posts-lists.component.ts</code> which exports the <code>PostsListsComponent</code>:</p>
+<p>Now, let's have a look at our <code>post-list.component.ts</code> which exports the <code>PostListComponent</code>:</p>
 
 <div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> {Component} <span class="pl-k">from</span> <span class="pl-s">'@angular/core'</span>;
-<span class="pl-k">import</span> {PostsDataService} <span class="pl-k">from</span> <span class="pl-s">'./posts-data.service'</span>;
-<span class="pl-k">import</span> {PostsData} <span class="pl-k">from</span> <span class="pl-s">'./posts-data'</span>;
+<span class="pl-k">import</span> {PostService} <span class="pl-k">from</span> <span class="pl-s">'./post.service'</span>;
+<span class="pl-k">import</span> {Post} <span class="pl-k">from</span> <span class="pl-s">'./post'</span>;
 
 @Component({
-    selector:<span class="pl-s">'posts-list'</span>,
+    selector: <span class="pl-s">'post-list'</span>,
     template: <span class="pl-s">`</span>
-<span class="pl-s">    &lt;div&gt;</span>
-<span class="pl-s">    &lt;/div&gt;</span>
+<span class="pl-s">        &lt;div&gt;</span>
+<span class="pl-s">        &lt;/div&gt;</span>
 <span class="pl-s">    `</span>
 })
 
-<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostsListsComponent</span> {
-    <span class="pl-en">constructor</span>(<span class="pl-k">private</span> <span class="pl-v">_postsDataService</span>: PostsDataService) {
+<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostListComponent</span> {
+    <span class="pl-en">constructor</span>(<span class="pl-k">private</span> <span class="pl-v">_postDataService</span>:PostService) {
         <span class="pl-c1">this</span>.getPosts();
     }
 
-    <span class="pl-k">private</span> <span class="pl-v">postsData</span>:PostsData[]<span class="pl-k">=</span>[];
-    <span class="pl-k">private</span> <span class="pl-v">errorMessage</span>:<span class="pl-k">any</span><span class="pl-k">=</span><span class="pl-s">''</span>;
+    <span class="pl-k">private</span> <span class="pl-v">posts</span>:Post[] <span class="pl-k">=</span> [];
+    <span class="pl-k">private</span> <span class="pl-v">errorMessage</span>:<span class="pl-k">any</span> <span class="pl-k">=</span> <span class="pl-s">''</span>;
 
     <span class="pl-en">getPosts</span>() {
         <span class="pl-c">//To Do: Fetch Posts here using PostsDataService</span>
@@ -159,17 +160,17 @@ In case you are not aware about the <strong>Angular2</strong> Services, you can 
 <p>Couple of most important tasks are still pending in the above component:</p>
 
 <ol>
-<li>We haven't yet written any code to display the list of posts.</li>
-<li>We still need to fetch the data from server using the <code>PostsDataService</code> i.e. the definition part of the <code>getPosts()</code> function.</li>
+<li>We haven't yet written any code to display the list of post.</li>
+<li>We still need to fetch the data from server using the <code>PostService</code> i.e. the definition part of the <code>getPosts()</code> function.</li>
 </ol>
 
-<p>So, let's move to the <code>posts-data.service.ts</code> where a lot of action will actually take place:</p>
+<p>So, let's move to the <code>post.service.ts</code> where a lot of action will actually take place:</p>
 
 <div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> {Injectable} <span class="pl-k">from</span> <span class="pl-s">"@angular/core"</span>;
-<span class="pl-k">import</span> {PostsData} <span class="pl-k">from</span> <span class="pl-s">'./posts-data'</span>;
+<span class="pl-k">import</span> {Post} <span class="pl-k">from</span> <span class="pl-s">'./post'</span>;
 
 @Injectable()
-<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostsDataService</span> {
+<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostService</span> {
 }</pre></div>
 
 <p>Now, let's start one by one:</p>
@@ -177,32 +178,40 @@ In case you are not aware about the <strong>Angular2</strong> Services, you can 
 <ol>
 <li>
 <p>First, we need to import <strong>Http</strong> and <strong>Response</strong> from <code>@angular/http</code> and also need to import <strong>Observable</strong> from <code>rxjs/Observable</code>.
-So our <code>posts-data.service.ts</code> would now be:</p>
+So our <code>post.service.ts</code> would now be:</p>
 
 <div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> {Injectable} <span class="pl-k">from</span> <span class="pl-s">"@angular/core"</span>;
-<span class="pl-k">import</span> {PostsData} <span class="pl-k">from</span> <span class="pl-s">'./posts-data'</span>;
+<span class="pl-k">import</span> {Post} <span class="pl-k">from</span> <span class="pl-s">'./post'</span>;
 <span class="pl-k">import</span> { Http, Response } <span class="pl-k">from</span> <span class="pl-s">'@angular/http'</span>;
 <span class="pl-k">import</span> { Observable } <span class="pl-k">from</span> <span class="pl-s">'rxjs/Observable'</span>;
 
 @Injectable()
-<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostsDataService</span> {
+<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostService</span> {
 }</pre></div>
 </li>
 <li>
 <p>We need to use a few operators in our <code>getData()</code> function so we need to import them. Instead of importing all the operators let's import the required ones 
-in <code>rxjs-operators.ts</code> and then import this into our <code>app.component.ts</code>. So our <code>app.component.ts</code> would now be:</p>
+in <code>rxjs-operators.ts</code> and then import this into our <code>app.component.ts</code>.</p>
+
+<p><strong>rxjs-operators.ts</strong>:</p>
+
+<div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> <span class="pl-s">'rxjs/add/operator/catch'</span>;
+<span class="pl-k">import</span> <span class="pl-s">'rxjs/add/operator/map'</span>;
+<span class="pl-k">import</span> <span class="pl-s">'rxjs/add/operator/toPromise'</span>;</pre></div>
+
+<p><strong>app.components.ts</strong>:</p>
 
 <div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> {Component} <span class="pl-k">from</span> <span class="pl-s">'@angular/core'</span>;
-<span class="pl-k">import</span> {PostsComponent} <span class="pl-k">from</span> <span class="pl-s">'./posts/post.component'</span>
+<span class="pl-k">import</span> {PostComponent} <span class="pl-k">from</span> <span class="pl-s">'./post/post.component'</span>
 <span class="pl-k">import</span> <span class="pl-s">'./rxjs-operators'</span>;
 
 @Component({
     selector: <span class="pl-s">'my-app'</span>,
     template: <span class="pl-s">`</span>
 <span class="pl-s">      &lt;h1&gt;Fetching:&lt;/h1&gt;</span>
-<span class="pl-s">      &lt;posts-parent&gt;&lt;/posts-parent&gt;</span>
+<span class="pl-s">      &lt;post-parent&gt;&lt;/post-parent&gt;</span>
 <span class="pl-s">    `</span>,
-    directives:[PostsComponent]
+    directives:[PostComponent]
 })
 
 <span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">AppComponent</span> {
@@ -211,83 +220,96 @@ in <code>rxjs-operators.ts</code> and then import this into our <code>app.compon
 <li>
 <p>Now, we need to have a <code>getData()</code> function which will get posts from the api. So here is what our <code>getData()</code> function should be like:</p>
 
-<div class="highlight highlight-source-ts"><pre>getData (): <span class="pl-en">Observable</span>&lt;PostsData[]&gt; {
-   <span class="pl-k">return</span> <span class="pl-c1">this</span>.http.get(<span class="pl-s">'http://jsonplaceholder.typicode.com/posts/'</span>)
-       .map(<span class="pl-c1">this</span>.extractData)
-       .catch(<span class="pl-c1">this</span>.handleError);
+<div class="highlight highlight-source-ts"><pre>getData():<span class="pl-en">Observable</span>&lt;Post[]&gt; {
+    <span class="pl-k">return</span> <span class="pl-c1">this</span>.http.get(<span class="pl-s">'http://jsonplaceholder.typicode.com/posts/'</span>)
+        .map(<span class="pl-c1">this</span>.extractData)
+        .catch(<span class="pl-c1">this</span>.handleError);
 }</pre></div>
 </li>
 </ol>
 
-<p>The api <a href="http://jsonplaceholder.typicode.com/posts/">http://jsonplaceholder.typicode.com/posts/</a> returns us an array of posts data whereas our <code>http.get</code> would return us an <strong>Observable</strong>.
-We then use the <strong>map</strong> operator which transforms the response emitted by Observable by applying a function to it. So in case of success, our flow 
+<p>The api <a href="http://jsonplaceholder.typicode.com/posts/">http://jsonplaceholder.typicode.com/posts/</a> returns us an array of post whereas our <code>http.get</code> would return us an <strong>Observable</strong>.
+We then use the <strong>map</strong> operator which transforms the response emitted by <strong>Observable</strong> by applying a function to it. So in case of success, our flow 
 would now move to <code>extractData()</code> function, which is:</p>
 
-<div class="highlight highlight-source-ts"><pre>private extractData(res: Response) {
+<div class="highlight highlight-source-ts"><pre>private extractData(res:Response) {
     <span class="pl-k">let</span> <span class="pl-v">body</span> = res.json();
     <span class="pl-k">return</span> body <span class="pl-k">||</span> [];
 }</pre></div>
 
-<p>In the above snippet we are transforming are response to the <strong>json</strong> format by doing <code>res.json()</code>.</p>
+<p>In the above snippet we are transforming response to the <strong>json</strong> format by doing <code>res.json()</code>.</p>
 
-<p>But in case, we had encountered error, our flow would have moved to <code>catch</code> operator. The <strong>catch</strong> operator intercepts an <strong>onError</strong> notification 
+<p>But in case had we encountered an error, our flow would have moved to <code>catch</code> operator. The <strong>catch</strong> operator intercepts an <strong>onError</strong> notification 
 from <strong>Observable</strong> and continues the sequence without error. <code>handleError()</code> function would have come into play in that case:</p>
 
-<div class="highlight highlight-source-ts"><pre>private handleError (error: <span class="pl-k">any</span>) {
-    <span class="pl-k">let</span> <span class="pl-v">errMsg</span> = (error.message) ? error.message : error.status ? `${error.status} <span class="pl-k">-</span> ${error.statusText}<span class="pl-s">` : 'Server error';</span>
-<span class="pl-s">    return Observable.throw(errMsg);</span>
-<span class="pl-s">}</span></pre></div>
+<div class="highlight highlight-source-ts"><pre>private handleError(error:<span class="pl-k">any</span>) {
+    <span class="pl-c">// In a real world app, we might use a remote logging infrastructure</span>
+    <span class="pl-c">// We'd also dig deeper into the error to get a better message</span>
+    <span class="pl-k">let</span> <span class="pl-v">errMsg</span> = (error.message) ? error.message :
+        error.status ? <span class="pl-s">`</span><span class="pl-k">${</span>error.status<span class="pl-k">}</span><span class="pl-s"> - </span><span class="pl-k">${</span>error.statusText<span class="pl-k">}</span><span class="pl-s">`</span> : <span class="pl-s">'Server error'</span>;
+    console.error(errMsg); <span class="pl-c">// log to console instead</span>
+    <span class="pl-k">return</span> Observable.throw(errMsg);
+}</pre></div>
 
-<p>After joining all the parts, our <code>posts-data.services.ts</code> would look like:</p>
+<p>After joining all the parts, our <code>post.service.ts</code> would look like:</p>
 
 <div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> {Injectable} <span class="pl-k">from</span> <span class="pl-s">"@angular/core"</span>;
-<span class="pl-k">import</span> {PostsData} <span class="pl-k">from</span> <span class="pl-s">'./posts-data'</span>;
-<span class="pl-k">import</span> { Http, Response } <span class="pl-k">from</span> <span class="pl-s">'@angular/http'</span>;
-<span class="pl-k">import</span> { Observable } <span class="pl-k">from</span> <span class="pl-s">'rxjs/Observable'</span>;
+<span class="pl-k">import</span> {Http, Response} <span class="pl-k">from</span> <span class="pl-s">'@angular/http'</span>;
+<span class="pl-k">import</span> {Observable} <span class="pl-k">from</span> <span class="pl-s">'rxjs/Observable'</span>;
+<span class="pl-k">import</span> {Post} <span class="pl-k">from</span> <span class="pl-s">'./post'</span>;
 
 @Injectable()
-<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostsDataService</span> {
-    <span class="pl-en">constructor</span> (<span class="pl-k">private</span> <span class="pl-v">http</span>: Http) {}
-    <span class="pl-en">getData</span> (): <span class="pl-en">Observable</span>&lt;PostsData[]&gt; {
+<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostService</span> {
+    <span class="pl-en">constructor</span>(<span class="pl-k">private</span> <span class="pl-v">http</span>:Http) {
+    }
+
+    <span class="pl-en">getData</span>():<span class="pl-en">Observable</span>&lt;Post[]&gt; {
         <span class="pl-k">return</span> <span class="pl-c1">this</span>.http.get(<span class="pl-s">'http://jsonplaceholder.typicode.com/posts/'</span>)
             .map(<span class="pl-c1">this</span>.extractData)
             .catch(<span class="pl-c1">this</span>.handleError);
     }
-    <span class="pl-k">private</span> <span class="pl-en">extractData</span>(<span class="pl-v">res</span>: Response) {
+
+    <span class="pl-k">private</span> <span class="pl-en">extractData</span>(<span class="pl-v">res</span>:Response) {
         <span class="pl-k">let</span> <span class="pl-v">body</span> = res.json();
         <span class="pl-k">return</span> body <span class="pl-k">||</span> [];
     }
-    <span class="pl-k">private</span> <span class="pl-en">handleError</span> (<span class="pl-v">error</span>: <span class="pl-k">any</span>) {
-        <span class="pl-k">let</span> <span class="pl-v">errMsg</span> = (error.message) ? error.message : error.status ? `${error.status} <span class="pl-k">-</span> ${error.statusText}<span class="pl-s">` : 'Server error';</span>
-<span class="pl-s">        return Observable.throw(errMsg);</span>
-<span class="pl-s">    }</span>
-<span class="pl-s">}</span></pre></div>
+
+    <span class="pl-k">private</span> <span class="pl-en">handleError</span>(<span class="pl-v">error</span>:<span class="pl-k">any</span>) {
+        <span class="pl-c">// In a real world app, we might use a remote logging infrastructure</span>
+        <span class="pl-c">// We'd also dig deeper into the error to get a better message</span>
+        <span class="pl-k">let</span> <span class="pl-v">errMsg</span> = (error.message) ? error.message :
+            error.status ? <span class="pl-s">`</span><span class="pl-k">${</span>error.status<span class="pl-k">}</span><span class="pl-s"> - </span><span class="pl-k">${</span>error.statusText<span class="pl-k">}</span><span class="pl-s">`</span> : <span class="pl-s">'Server error'</span>;
+        console.error(errMsg); <span class="pl-c">// log to console instead</span>
+        <span class="pl-k">return</span> Observable.throw(errMsg);
+    }
+}</pre></div>
 
 <p>We should note that the above <strong>Observable</strong> is a <strong>cold observable</strong>. So one has to <strong>subscribe</strong> to it.</p>
 
-<p>Now, let's move back to the <code>PostsListsComponent</code> and complete our pending stuff:</p>
+<p>Now, let's move back to the <code>PostListComponent</code> and complete our pending stuff:</p>
 
 <ol>
 <li>
 <p>We will first add definition part to our <code>getPosts()</code> function:</p>
 
 <div class="highlight highlight-source-ts"><pre>getPosts() {
-    <span class="pl-c1">this</span>._postsDataService.getData()
+    <span class="pl-c1">this</span>._postDataService.getData()
         .subscribe(
-            posts <span class="pl-k">=&gt;</span> <span class="pl-c1">this</span>.postsData<span class="pl-k">=</span>posts,
-            error <span class="pl-k">=&gt;</span>  <span class="pl-c1">this</span>.errorMessage <span class="pl-k">=</span> &lt;<span class="pl-k">any</span>&gt;error);
+            posts <span class="pl-k">=&gt;</span> <span class="pl-c1">this</span>.posts <span class="pl-k">=</span> posts,
+            error <span class="pl-k">=&gt;</span> <span class="pl-c1">this</span>.errorMessage <span class="pl-k">=</span> &lt;<span class="pl-k">any</span>&gt;error);
 }</pre></div>
 
 <p>We can see the <strong>subscribe</strong> operator in the above snippet. In <strong>Rxjs</strong> one can <strong>subscribe</strong> to an <strong>Observable</strong> by passing 0 to 3 individual 
 functions <code>onNext</code>, <code>onError</code> and <code>onCompleted</code>.</p>
 </li>
 <li>
-<p>Now, we need to display the fetched <code>posts</code> in this <code>PostsListsComponent</code>. So our template would like:</p>
+<p>Now, we need to display the fetched <code>post</code> in this <code>PostListComponent</code>. So our template would like:</p>
 
 <div class="highlight highlight-text-html-basic"><pre>&lt;<span class="pl-ent">div</span>&gt;
     &lt;<span class="pl-ent">ul</span> <span class="pl-e">class</span>=<span class="pl-s"><span class="pl-pds">"</span>items<span class="pl-pds">"</span></span>&gt;
-    &lt;<span class="pl-ent">li</span> *<span class="pl-e">ngFor</span>=<span class="pl-s"><span class="pl-pds">"</span>let postData of postsData<span class="pl-pds">"</span></span>&gt;
-    &lt;<span class="pl-ent">span</span>&gt;{{postData.title}}&lt;/<span class="pl-ent">span</span>&gt;&lt;/<span class="pl-ent">li</span>&gt;
+        &lt;<span class="pl-ent">li</span> *<span class="pl-e">ngFor</span>=<span class="pl-s"><span class="pl-pds">"</span>let post of posts<span class="pl-pds">"</span></span>&gt;
+            &lt;<span class="pl-ent">span</span>&gt;{{post.title}}&lt;/<span class="pl-ent">span</span>&gt;
+        &lt;/<span class="pl-ent">li</span>&gt;
     &lt;/<span class="pl-ent">ul</span>&gt;
 &lt;/<span class="pl-ent">div</span>&gt;</pre></div>
 </li>
@@ -295,54 +317,55 @@ functions <code>onNext</code>, <code>onError</code> and <code>onCompleted</code>
 
 <p>In case you are not aware about how to iterate over <strong>Arrays</strong>, <strong>Map</strong>, <strong>Set</strong> you can have a quick read <a href="http://namitamalik.github.io/NgRepeat-vs-ngFor/">here</a>.</p>
 
-<p>So now our complete <code>PostsListsComponent</code> would look like:</p>
+<p>So now our complete <code>PostListComponent</code> would look like:</p>
 
 <div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> {Component} <span class="pl-k">from</span> <span class="pl-s">'@angular/core'</span>;
-<span class="pl-k">import</span> {PostsDataService} <span class="pl-k">from</span> <span class="pl-s">'./posts-data.service'</span>;
-<span class="pl-k">import</span> {PostsData} <span class="pl-k">from</span> <span class="pl-s">'./posts-data'</span>;
+<span class="pl-k">import</span> {PostService} <span class="pl-k">from</span> <span class="pl-s">'./post.service'</span>;
+<span class="pl-k">import</span> {Post} <span class="pl-k">from</span> <span class="pl-s">'./post'</span>;
 
 @Component({
-    selector:<span class="pl-s">'posts-list'</span>,
+    selector: <span class="pl-s">'post-list'</span>,
     template: <span class="pl-s">`</span>
-<span class="pl-s">    &lt;div&gt;</span>
-<span class="pl-s">        &lt;ul class="items"&gt;</span>
-<span class="pl-s">        &lt;li *ngFor="let postData of postsData"&gt;</span>
-<span class="pl-s">        &lt;span&gt;{{postData.title}}&lt;/span&gt;&lt;/li&gt;</span>
-<span class="pl-s">        &lt;/ul&gt;</span>
-<span class="pl-s">    &lt;/div&gt;</span>
+<span class="pl-s">        &lt;div&gt;</span>
+<span class="pl-s">            &lt;ul class="items"&gt;</span>
+<span class="pl-s">                &lt;li *ngFor="let post of posts"&gt;</span>
+<span class="pl-s">                    &lt;span&gt;{{post.title}}&lt;/span&gt;</span>
+<span class="pl-s">                &lt;/li&gt;</span>
+<span class="pl-s">            &lt;/ul&gt;</span>
+<span class="pl-s">        &lt;/div&gt;</span>
 <span class="pl-s">    `</span>
 })
 
-<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostsListsComponent</span> {
-    <span class="pl-en">constructor</span>(<span class="pl-k">private</span> <span class="pl-v">_postsDataService</span>: PostsDataService) {
+<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostListComponent</span> {
+    <span class="pl-en">constructor</span>(<span class="pl-k">private</span> <span class="pl-v">_postDataService</span>:PostService) {
         <span class="pl-c1">this</span>.getPosts();
     }
 
-    <span class="pl-k">private</span> <span class="pl-v">postsData</span>:PostsData[]<span class="pl-k">=</span>[];
-    <span class="pl-k">private</span> <span class="pl-v">errorMessage</span>:<span class="pl-k">any</span><span class="pl-k">=</span><span class="pl-s">''</span>;
+    <span class="pl-k">private</span> <span class="pl-v">posts</span>:Post[] <span class="pl-k">=</span> [];
+    <span class="pl-k">private</span> <span class="pl-v">errorMessage</span>:<span class="pl-k">any</span> <span class="pl-k">=</span> <span class="pl-s">''</span>;
 
     <span class="pl-en">getPosts</span>() {
-        <span class="pl-c1">this</span>._postsDataService.getData()
+        <span class="pl-c1">this</span>._postDataService.getData()
             .subscribe(
-                posts <span class="pl-k">=&gt;</span> <span class="pl-c1">this</span>.postsData<span class="pl-k">=</span>posts,
-                error <span class="pl-k">=&gt;</span>  <span class="pl-c1">this</span>.errorMessage <span class="pl-k">=</span> &lt;<span class="pl-k">any</span>&gt;error);
+                posts <span class="pl-k">=&gt;</span> <span class="pl-c1">this</span>.posts <span class="pl-k">=</span> posts,
+                error <span class="pl-k">=&gt;</span> <span class="pl-c1">this</span>.errorMessage <span class="pl-k">=</span> &lt;<span class="pl-k">any</span>&gt;error);
     }
 }</pre></div>
 
-<p>We have completed all the pending stuff and now we should be able to see list of posts.</p>
+<p>We have completed all the pending stuff and now we should be able to see list of post.</p>
 
-<p>But before we end this post, let's have a look at one for operator i.e. <strong>toPromise</strong>. This <strong>operator</strong> converts an <strong>Observable</strong> 
-sequence to a <strong>promise</strong>. So if we use promises, then our <code>posts-data.service.ts</code> would look like:</p>
+<p>But before we end this post, let's have a look at one more operator i.e. <strong>toPromise</strong>. This <strong>operator</strong> converts an <strong>Observable</strong> 
+sequence to a <strong>promise</strong>. So if we use promises, then our <code>post.service.ts</code> would look like:</p>
 
 <div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> {Injectable} <span class="pl-k">from</span> <span class="pl-s">"@angular/core"</span>;
-<span class="pl-k">import</span> {PostsData} <span class="pl-k">from</span> <span class="pl-s">'./posts-data'</span>;
+<span class="pl-k">import</span> {Post} <span class="pl-k">from</span> <span class="pl-s">'./post'</span>;
 <span class="pl-k">import</span> { Http, Response } <span class="pl-k">from</span> <span class="pl-s">'@angular/http'</span>;
 <span class="pl-k">import</span> { Observable } <span class="pl-k">from</span> <span class="pl-s">'rxjs/Observable'</span>;
 
 @Injectable()
-<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostsDataService</span> {
+<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostService</span> {
     <span class="pl-en">constructor</span> (<span class="pl-k">private</span> <span class="pl-v">http</span>: Http) {}
-    <span class="pl-en">getData</span> (): <span class="pl-en">Promise</span>&lt;PostsData[]&gt; {
+    <span class="pl-en">getData</span> (): <span class="pl-en">Promise</span>&lt;Post[]&gt; {
         <span class="pl-k">return</span> <span class="pl-c1">this</span>.http.get(<span class="pl-s">'http://jsonplaceholder.typicode.com/posts/'</span>)
             .toPromise()
             .then(<span class="pl-c1">this</span>.extractData)
@@ -364,41 +387,42 @@ sequence to a <strong>promise</strong>. So if we use promises, then our <code>po
 
 <p>If you could notice the difference, we have moved <code>this.extractData</code> which is the <strong>success callback</strong> as the first parameter whereas <code>this.errorHandler</code> is the second parameter.</p>
 
-<p>Since we are now using <strong>promises</strong> we will also have to make tweaks in <code>posts-lists.component.ts</code>. We will have to call <code>then</code> on the  returned promise instead of <code>subscribe</code>.</p>
+<p>Since we are now using <strong>promises</strong> we will also have to make tweaks in <code>post-list.component.ts</code>. We will have to call <code>then</code> on the returned promise instead of <code>subscribe</code>.</p>
 
 <div class="highlight highlight-source-ts"><pre><span class="pl-k">import</span> {Component} <span class="pl-k">from</span> <span class="pl-s">'@angular/core'</span>;
-<span class="pl-k">import</span> {PostsDataService} <span class="pl-k">from</span> <span class="pl-s">'./posts-data.service'</span>;
-<span class="pl-k">import</span> {PostsData} <span class="pl-k">from</span> <span class="pl-s">'./posts-data'</span>;
+<span class="pl-k">import</span> {PostService} <span class="pl-k">from</span> <span class="pl-s">'./post.service'</span>;
+<span class="pl-k">import</span> {Post} <span class="pl-k">from</span> <span class="pl-s">'./post'</span>;
 
 @Component({
-    selector:<span class="pl-s">'posts-list'</span>,
+    selector: <span class="pl-s">'post-list'</span>,
     template: <span class="pl-s">`</span>
-<span class="pl-s">    &lt;div&gt;</span>
-<span class="pl-s">        &lt;ul class="items"&gt;</span>
-<span class="pl-s">        &lt;li *ngFor="let postData of postsData"&gt;</span>
-<span class="pl-s">        &lt;span&gt;{{postData.title}}&lt;/span&gt;&lt;/li&gt;</span>
-<span class="pl-s">        &lt;/ul&gt;</span>
-<span class="pl-s">    &lt;/div&gt;</span>
+<span class="pl-s">        &lt;div&gt;</span>
+<span class="pl-s">            &lt;ul class="items"&gt;</span>
+<span class="pl-s">                &lt;li *ngFor="let post of posts"&gt;</span>
+<span class="pl-s">                    &lt;span&gt;{{post.title}}&lt;/span&gt;</span>
+<span class="pl-s">                &lt;/li&gt;</span>
+<span class="pl-s">            &lt;/ul&gt;</span>
+<span class="pl-s">        &lt;/div&gt;</span>
 <span class="pl-s">    `</span>
 })
 
-<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostsListsComponent</span> {
-    <span class="pl-en">constructor</span>(<span class="pl-k">private</span> <span class="pl-v">_postsDataService</span>: PostsDataService) {
+<span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostListComponent</span> {
+    <span class="pl-en">constructor</span>(<span class="pl-k">private</span> <span class="pl-v">_postDataService</span>:PostService) {
         <span class="pl-c1">this</span>.getPosts();
     }
 
-    <span class="pl-k">private</span> <span class="pl-v">postsData</span>:PostsData[]<span class="pl-k">=</span>[];
-    <span class="pl-k">private</span> <span class="pl-v">errorMessage</span>:<span class="pl-k">any</span><span class="pl-k">=</span><span class="pl-s">''</span>;
+    <span class="pl-k">private</span> <span class="pl-v">posts</span>:Post[] <span class="pl-k">=</span> [];
+    <span class="pl-k">private</span> <span class="pl-v">errorMessage</span>:<span class="pl-k">any</span> <span class="pl-k">=</span> <span class="pl-s">''</span>;
 
     <span class="pl-en">getPosts</span>() {
-        <span class="pl-c1">this</span>._postsDataService.getData()
+        <span class="pl-c1">this</span>._postDataService.getData()
             .then(
-                posts <span class="pl-k">=&gt;</span> <span class="pl-c1">this</span>.postsData<span class="pl-k">=</span>posts,
-                error <span class="pl-k">=&gt;</span>  <span class="pl-c1">this</span>.errorMessage <span class="pl-k">=</span> &lt;<span class="pl-k">any</span>&gt;error);
+                posts <span class="pl-k">=&gt;</span> <span class="pl-c1">this</span>.posts <span class="pl-k">=</span> posts,
+                error <span class="pl-k">=&gt;</span> <span class="pl-c1">this</span>.errorMessage <span class="pl-k">=</span> &lt;<span class="pl-k">any</span>&gt;error);
     }
 }</pre></div>
 
-<p>As promised this blog educated us on fetching data in <strong>Angular2</strong> We are yet to see how to post data to a server in <strong>Angular2</strong> so stay tuned! till then Happy Learning!</p>
+<p>As promised this blog educated us on fetching data in <strong>Angular2</strong> We are yet to see how to post data to a server in <strong>Angular2</strong> so stay tuned! Till then Happy Learning!</p>
 
 <h2>
 <a id="follow-me" class="anchor" href="#follow-me" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Follow Me</h2>
