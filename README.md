@@ -14,12 +14,12 @@ $http({method: 'GET', url: '/someUrl'})
 
 As it can be seen above, **$http** returns a **promise** where we register two callbacks for **success** and **error**.
 
-Now, let's move on to **Angular2**, and see how stuff works in it. **Angular2** has **Http** service which is used to make **get** calls to server. But an important thing to note here is that though **$http** service in **Angular1.x** returned a **promise** while  **Http** service in **Angular2** returns **Observables**.
+Now, let's move on to **Angular2**, and see how stuff works in it. **Angular2** has **Http** service which is used to make **get** calls to server. But an important thing to note here is that **$http** service in **Angular1.x** returned a **promise** while  **Http** service in **Angular2** returns **Observables**.
 
 So, before we dive deeper into **Http** service, let's quickly have a glimpse at **Observables**:
 
 To start off with, **Observables** are nothing but a stream of data.These data streams can be of anything - a stream of variables, properties, data structures or
-even stream of events. One react to the stream by listening to it. **Observables** are basically based on **Observer Design Pattern**. In **Observer Design Pattern** one-to-many dependency is maintained between the objects, when one object changes its state all other objects/dependents are notified. These dependents are known as **Observers**.
+even stream of events. One can react to the stream by listening to it. **Observables** are basically based on **Observer Design Pattern**. In **Observer Design Pattern** one-to-many dependency is maintained between the objects, when one object changes its state all other objects/dependents are notified. These dependents are known as **Observers**.
 
 A stream can emit 3 different things:
 
@@ -32,7 +32,7 @@ One can capture these events by using these functions. These functions are known
 
 **Observables** can be of two types:
 
-**1.Hot** - **Hot observables** are those which produce values even before their subscription gets activated. One can consider **Hot Observables** as live performances. The **hot observable** sequence is shared among each **subscriber**, also each **subscriber** gets the next value 
+**1.Hot** - **Hot observables** are those which produce values even before their subscription gets activated. One can consider **Hot Observables** as live performance. The **hot observable** sequence is shared among each **subscriber**, also each **subscriber** gets the next value 
  in the sequence.
 
 **2.Cold** - **Cold observables** behave like standard **iterators**. They push values only when we subscribes to them and they reset when we subscribe again. One can consider **Cold Observables** as a movie.
@@ -43,7 +43,7 @@ Well, the above discussion is not even a tip of the iceberg on a subject such as
 
 Let's now move back the original agenda of this blog i.e. fetching data using **Http** service. Here is a sample use case:
 
-> We need to display a list of post. The list of post can be fetched through this API - http://jsonplaceholder.typicode.com/posts/.
+> We need to display a list of posts. The list of posts can be fetched through this API - http://jsonplaceholder.typicode.com/posts/.
 
 To achieve the above scenario let's break this small app into parts:
 
@@ -167,7 +167,8 @@ So our `post.service.ts` would now be:
     ```
 
 2. We need to use a few operators in our `getData()` function so we need to import them. Instead of importing all the operators let's import the required ones 
-in `rxjs-operators.ts` and then import this into our `app.component.ts`. So our `app.component.ts` would now be:
+in `rxjs-operators.ts` and then import this into our `app.component.ts`.
+
     **rxjs-operators.ts**:
     ```TypeScript
     import 'rxjs/add/operator/catch';
@@ -204,7 +205,7 @@ in `rxjs-operators.ts` and then import this into our `app.component.ts`. So our 
     ```
 
 The api http://jsonplaceholder.typicode.com/posts/ returns us an array of post whereas our `http.get` would return us an **Observable**.
-We then use the **map** operator which transforms the response emitted by Observable by applying a function to it. So in case of success, our flow 
+We then use the **map** operator which transforms the response emitted by **Observable** by applying a function to it. So in case of success, our flow 
 would now move to `extractData()` function, which is:
 
 ```TypeScript
@@ -214,9 +215,9 @@ private extractData(res:Response) {
 }
 ```
 
-In the above snippet we are transforming are response to the **json** format by doing `res.json()`.
+In the above snippet we are transforming response to the **json** format by doing `res.json()`.
 
-But in case, we had encountered error, our flow would have moved to `catch` operator. The **catch** operator intercepts an **onError** notification 
+But in case had we encountered an error, our flow would have moved to `catch` operator. The **catch** operator intercepts an **onError** notification 
 from **Observable** and continues the sequence without error. `handleError()` function would have come into play in that case:
 
 ```TypeScript
