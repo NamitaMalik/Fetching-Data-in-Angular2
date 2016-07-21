@@ -20,6 +20,7 @@ import {Post} from './post';
 
 export class PostListComponent {
     constructor(private _postDataService:PostService) {
+        //should be moved to ngOnInit lifecycle hook
         this.getPosts();
     }
 

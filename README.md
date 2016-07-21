@@ -318,6 +318,7 @@ import {Post} from './post';
 
 export class PostListComponent {
     constructor(private _postDataService:PostService) {
+        //should be moved to ngOnInit lifecycle hook
         this.getPosts();
     }
 
@@ -332,6 +333,8 @@ export class PostListComponent {
     }
 }
 ```
+
+> It is important to note that though we have called `getPosts` function in constructor, it is not a good practice. We should have called it in the **ngOnInit** lifecycle hook. Our constructors should be simple to enable easy debugging and testing.
 
 We have completed all the pending stuff and now we should be able to see list of post.
 
