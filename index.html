@@ -338,6 +338,7 @@ functions <code>onNext</code>, <code>onError</code> and <code>onCompleted</code>
 
 <span class="pl-k">export</span> <span class="pl-k">class</span> <span class="pl-en">PostListComponent</span> {
     <span class="pl-en">constructor</span>(<span class="pl-k">private</span> <span class="pl-v">_postDataService</span>:PostService) {
+        <span class="pl-c">//should be moved to ngOnInit lifecycle hook</span>
         <span class="pl-c1">this</span>.getPosts();
     }
 
@@ -351,6 +352,10 @@ functions <code>onNext</code>, <code>onError</code> and <code>onCompleted</code>
                 error <span class="pl-k">=&gt;</span> <span class="pl-c1">this</span>.errorMessage <span class="pl-k">=</span> &lt;<span class="pl-k">any</span>&gt;error);
     }
 }</pre></div>
+
+<blockquote>
+<p>It is important to note that though we have called <code>getPosts</code> function in constructor, it is not a good practice. We should have called it in the <strong>ngOnInit</strong> lifecycle hook. Our constructors should be simple to enable easy debugging and testing.</p>
+</blockquote>
 
 <p>We have completed all the pending stuff and now we should be able to see list of post.</p>
 
